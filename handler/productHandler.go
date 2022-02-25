@@ -8,20 +8,13 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/wintltr/vand-interview-crud-project/authentication"
 	"github.com/wintltr/vand-interview-crud-project/model"
 	"github.com/wintltr/vand-interview-crud-project/util"
 )
 
-func AddStoreHandler(w http.ResponseWriter, r *http.Request) {
+func AddProductHandler(w http.ResponseWriter, r *http.Request) {
 
-	var store model.Store
-
-	tokenData, err := authentication.ExtractTokenMetadata(r)
-	if err != nil {
-		util.ERROR(w, http.StatusBadRequest, errors.New("Please login").Error())
-		return
-	}
+	var product model.Product
 
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -29,23 +22,22 @@ func AddStoreHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	
-	err = json.Unmarshal(body, &store)
+	err = json.Unmarshal(body, &product)
 	if err != nil {
 		util.ERROR(w, http.StatusBadRequest, errors.New("Fail to parse json format").Error())
 		return
 	}
-	store.UserId = tokenData.Userid
 
-	err = model.InsertStoreToDB(store)
+	err = model.InsertProductToDB(product)
 
 	if err != nil {
 		util.JSON(w, http.StatusBadRequest, errors.New(err.Error()))
 	} else {
-		util.JSON(w, http.StatusOK, store)
+		util.JSON(w, http.StatusOK, product)
 	}
 }
 
-func RemoveStoreHandler(w http.ResponseWriter, r *http.Request) {
+func RemoveProductHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Retrieve Id
 	vars := mux.Vars(r)
@@ -55,23 +47,22 @@ func RemoveStoreHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = model.DeleteStoreFromDB(storeId)
+	err = model.DeleteProductFromDB(storeId)
 	if err != nil {
-		util.ERROR(w, http.StatusOK, errors.New("Failed to remove store").Error())
+		util.ERROR(w, http.StatusOK, errors.New("Failed to remove product from database").Error())
 	} else {
 		util.JSON(w, http.StatusOK, nil)
 	}
 }
 
-func ListAllStoreHandler(w http.ResponseWriter, r *http.Request) {
+func ListAllProductHandler(w http.ResponseWriter, r *http.Request) {
 
-	storeList, err := model.GetAllStoreFromDB()
+	productList, err := model.GetAllProductFromDB()
 
 	// Return json
 	if err != nil {
 		util.ERROR(w, http.StatusBadRequest, errors.New("fail to get all list web app users").Error())
 	} else {
-		util.JSON(w, http.StatusOK, storeList)
+		util.JSON(w, http.StatusOK, productList)
 	}
 }
-

@@ -48,3 +48,33 @@ func DeleteStoreFromDB(id int) error {
 	}
 	return err
 }
+
+func GetAllStoreFromDB() ([]Store, error) {
+	db := database.ConnectDB()
+	defer db.Close()
+
+	var storeList []Store
+	selDB, err := db.Query("SELECT store_id, store_name, store_description, user_id FROM STORE")
+	if err != nil {
+		return storeList, err
+	}
+
+	var store Store
+	for selDB.Next() {
+		err = selDB.Scan(&store.StoreId, &store.Name, &store.Description, &store.UserId)
+		if err != nil {
+			return storeList, err
+		}
+		storeList = append(storeList, store)
+	}
+
+	return storeList, err
+}
+
+// func GetAllStoreFromDBByPage(page int) ([]Store, error) {
+// 	storeList, err := GetAllStoreFromDB()
+// 	if err != nil {
+// 		return nil, err
+// 	}
+	
+// }

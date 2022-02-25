@@ -19,7 +19,7 @@ CREATE TABLE STORE (
 CREATE TABLE PRODUCT (
     product_id INT PRIMARY KEY AUTO_INCREMENT,
     product_name varchar(60),
-    product_price INT,
+    product_price FLOAT,
     product_variant varchar(60),
     store_id INT,
     FOREIGN KEY (store_id) REFERENCES STORE(store_id)
