@@ -67,12 +67,12 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	db := database.ConnectDB()
 	defer db.Close()
 
-	err = model.CheckLogin(user.Username, user.Password)
+	userId, err := model.CheckLogin(user.Username, user.Password)
 	if err != nil {
 		util.ERROR(w, http.StatusUnauthorized, "Wrong Username or Password")
 		return
 	} else {
-		token, err := authentication.CreateToken(user.UserId)
+		token, err := authentication.CreateToken(userId)
 		if err != nil {
 			util.ERROR(w, http.StatusUnauthorized, "Fail to create token while login")
 			return

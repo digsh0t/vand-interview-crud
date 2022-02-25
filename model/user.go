@@ -55,7 +55,7 @@ func GetAllUserFromDB() ([]User, error) {
 	return waUserList, err
 }
 
-func CheckLogin(username string, password string) error {
+func CheckLogin(username string, password string) (int,error) {
 
 	var userId int
 	db := database.ConnectDB()
@@ -64,5 +64,5 @@ func CheckLogin(username string, password string) error {
 	hashedPassword := fmt.Sprintf("%x", md5.Sum([]byte(password)))
 	row := db.QueryRow("SELECT user_id FROM USER WHERE user_username = ? AND user_password = ?", username, hashedPassword)
 	err := row.Scan(&userId)
-	return err
+	return userId, err
 }

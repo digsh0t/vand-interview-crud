@@ -19,5 +19,8 @@ func main() {
 	router.HandleFunc("/register", handler.RegisterHandler).Methods("POST")
 	router.HandleFunc("/listall", handler.ListAllWebAppUser).Methods("GET")
 
+	//Store routing
+	router.HandleFunc("/stores", handler.AddStoreHandler).Methods("POST")
+
 	log.Fatal(http.ListenAndServe(":8081", handlers.CORS(credentials, methods, origins)(router)))
 }
