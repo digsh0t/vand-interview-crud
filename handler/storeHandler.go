@@ -5,7 +5,9 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 
+	"github.com/gorilla/mux"
 	"github.com/wintltr/vand-interview-crud-project/authentication"
 	"github.com/wintltr/vand-interview-crud-project/model"
 	"github.com/wintltr/vand-interview-crud-project/util"
@@ -40,5 +42,23 @@ func AddStoreHandler(w http.ResponseWriter, r *http.Request) {
 		util.JSON(w, http.StatusBadRequest, errors.New(err.Error()))
 	} else {
 		util.JSON(w, http.StatusOK, store)
+	}
+}
+
+func RemoveStoreHandler(w http.ResponseWriter, r *http.Request) {
+
+	// Retrieve Id
+	vars := mux.Vars(r)
+	storeId, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		util.ERROR(w, http.StatusUnauthorized, errors.New("Failed to retrieve Id").Error())
+		return
+	}
+
+	err = model.DeleteStoreFromDB(storeId)
+	if err != nil {
+		util.ERROR(w, http.StatusOK, errors.New("Failed to remove store").Error())
+	} else {
+		util.JSON(w, http.StatusOK, nil)
 	}
 }

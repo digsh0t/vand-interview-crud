@@ -21,6 +21,7 @@ func main() {
 
 	//Store routing
 	router.HandleFunc("/stores", handler.AddStoreHandler).Methods("POST")
+	router.HandleFunc("/store-management/stores/{id}", handler.RemoveStoreHandler).Methods("DELETE")
 
 	log.Fatal(http.ListenAndServe(":8081", handlers.CORS(credentials, methods, origins)(router)))
 }

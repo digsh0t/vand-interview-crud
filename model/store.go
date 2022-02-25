@@ -27,3 +27,24 @@ func InsertStoreToDB(store Store) error {
 	}
 	return err
 }
+
+func DeleteStoreFromDB(id int) error {
+	db := database.ConnectDB()
+	defer db.Close()
+
+	stmt, err := db.Prepare("DELETE FROM STORE WHERE store_id = ?")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	res, err := stmt.Exec(id)
+	if err != nil {
+		return err
+	}
+	rows, err := res.RowsAffected()
+	if rows == 0 {
+		return err
+	}
+	return err
+}
