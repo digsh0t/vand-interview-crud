@@ -22,10 +22,12 @@ func main() {
 	//Store routing
 	router.HandleFunc("/stores", handler.AddStoreHandler).Methods("POST")
 	router.HandleFunc("/store-management/stores/{id}", handler.RemoveStoreHandler).Methods("DELETE")
+	router.HandleFunc("/store-management/stores/{id}", handler.StoreDetailHandler).Methods("GET")
 
 	//Product routing
 	router.HandleFunc("/product-management/products", handler.AddProductHandler).Methods("POST")
 	router.HandleFunc("/product-management/products/{id}", handler.RemoveProductHandler).Methods("DELETE")
+	router.HandleFunc("/product-management/products/{id}", handler.ProductDetailHandler).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":8081", handlers.CORS(credentials, methods, origins)(router)))
 }

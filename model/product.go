@@ -69,3 +69,40 @@ func GetAllProductFromDB() ([]Product, error) {
 
 	return productList, err
 }
+
+func GetProductByIdFromDB(productId int) (Product, error) {
+	db := database.ConnectDB()
+	defer db.Close()
+
+	var product Product
+	row := db.QueryRow("SELECT product_id, product_name, product_price, product_variant, store_id FROM PRODUCT WHERE product_id = ?", productId)
+	err := row.Scan(&product.ProductId, &product.Name, &product.Price, &product.Variant, &product.StoreId)
+	if err != nil {
+		return product, err
+	}
+
+	return product, err
+
+}
+
+func GetProductListByStoreFromDB(storeId int) ([]Product, error) {
+	db := database.ConnectDB()
+	defer db.Close()
+
+	var productList []Product
+	selDB, err := db.Query("SELECT product_id, product_name, product_price, product_variant, store_id FROM PRODUCT where store_id = ?",storeId)
+	if err != nil {
+		return productList, err
+	}
+
+	var product Product
+	for selDB.Next() {
+		err = selDB.Scan(&product.ProductId, &product.Name, &product.Price, &product.Variant, &product.StoreId)
+		if err != nil {
+			return productList, err
+		}
+		productList = append(productList, product)
+	}
+
+	return productList, err
+}

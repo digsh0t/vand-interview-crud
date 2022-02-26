@@ -8,6 +8,7 @@ type Store struct {
 	StoreId int `json:"store_id"`
 	Name string `json:"store_name"`
 	Description string `json:"store_description"`
+	ProductList []Product `json:"product_list"`
 	UserId int `json:"store_userid"`
 }
 
@@ -78,3 +79,19 @@ func GetAllStoreFromDB() ([]Store, error) {
 // 	}
 	
 // }
+
+func GetStoreByIdFromDB(storeId int) (Store, error) {
+	db := database.ConnectDB()
+	defer db.Close()
+
+	var store Store
+	row := db.QueryRow("SELECT store_id, store_name, store_description, user_id FROM STORE WHERE store_id = ?", storeId)
+	err := row.Scan(&store.StoreId, &store.Name, &store.Description, &store.UserId)
+	if err != nil {
+		return store, err
+	}
+	
+	store.ProductList, err = GetProductListByStoreFromDB(store.StoreId)
+	return store, err
+
+}

@@ -75,3 +75,22 @@ func ListAllStoreHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func StoreDetailHandler(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	storeId, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		util.ERROR(w, http.StatusBadRequest, "failed to get store detail")
+		return
+	}
+
+	product, err := model.GetStoreByIdFromDB(storeId)
+
+	// Return json
+	if err != nil {
+		util.ERROR(w, http.StatusBadRequest, err.Error())
+	} else {
+		util.JSON(w, http.StatusOK, product)
+	}
+
+}

@@ -66,3 +66,23 @@ func ListAllProductHandler(w http.ResponseWriter, r *http.Request) {
 		util.JSON(w, http.StatusOK, productList)
 	}
 }
+
+func ProductDetailHandler(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	productId, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		util.ERROR(w, http.StatusBadRequest, "failed to get product detail")
+		return
+	}
+
+	product, err := model.GetProductByIdFromDB(productId)
+
+	// Return json
+	if err != nil {
+		util.ERROR(w, http.StatusBadRequest, err.Error())
+	} else {
+		util.JSON(w, http.StatusOK, product)
+	}
+
+}
