@@ -29,5 +29,8 @@ func main() {
 	router.HandleFunc("/product-management/products/{id}", handler.RemoveProductHandler).Methods("DELETE")
 	router.HandleFunc("/product-management/products/{id}", handler.ProductDetailHandler).Methods("GET")
 
+	//User routing
+	router.HandleFunc("/user-management/users/{id}", handler.UserDetailHandler).Methods("GET")
+
 	log.Fatal(http.ListenAndServe(":8081", handlers.CORS(credentials, methods, origins)(router)))
 }

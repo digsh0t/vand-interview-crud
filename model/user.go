@@ -13,6 +13,7 @@ type User struct {
 	Password string `json:"password"`
 	Email string `json:"email"`
 	Role string `json:"role"`
+	StoreList []Store `json:"store_list"`
 }
 
 func InsertUserToDB(u User) error {
@@ -65,4 +66,19 @@ func CheckLogin(username string, password string) (int,error) {
 	row := db.QueryRow("SELECT user_id FROM USER WHERE user_username = ? AND user_password = ?", username, hashedPassword)
 	err := row.Scan(&userId)
 	return userId, err
+}
+
+func GetUserByIdFromDB(userId int) (User, error) {
+	db := database.ConnectDB()
+	defer db.Close()
+
+	var user User
+	row := db.QueryRow("SELECT user_id, user_username, user_role,user_email FROM USER WHERE user_id = ?", userId)
+	err := row.Scan(&user.UserId, &user.Username, &user.Role, &user.Email)
+	if err != nil {
+		return user, err
+	}
+
+	user.StoreList, err = GetStoreListByUserFromDB(user.UserId)
+	return user, err
 }

@@ -90,8 +90,33 @@ func GetStoreByIdFromDB(storeId int) (Store, error) {
 	if err != nil {
 		return store, err
 	}
-	
+
 	store.ProductList, err = GetProductListByStoreFromDB(store.StoreId)
 	return store, err
+}
 
+func GetStoreListByUserFromDB(userId int) ([]Store, error) {
+	db := database.ConnectDB()
+	defer db.Close()
+
+	var storeList []Store
+	selDB, err := db.Query("SELECT store_id, store_name, store_description, user_id FROM STORE where user_id = ?",userId)
+	if err != nil {
+		return storeList, err
+	}
+
+	var store Store
+	for selDB.Next() {
+		err = selDB.Scan(&store.StoreId, &store.Name, &store.Description, &store.UserId)
+		if err != nil {
+			return storeList, err
+		}
+		store.ProductList, err = GetProductListByStoreFromDB(store.StoreId)
+		if err != nil {
+			return storeList, err
+		}
+		storeList = append(storeList, store)
+	}
+
+	return storeList, err
 }
