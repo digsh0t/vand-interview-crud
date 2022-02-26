@@ -86,3 +86,28 @@ func ProductDetailHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
+
+func UpdateProductHandler(w http.ResponseWriter, r *http.Request) {
+
+	var product model.Product
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		util.ERROR(w, http.StatusBadRequest, errors.New("Fail to update product").Error())
+		return
+	}
+	
+	err = json.Unmarshal(body, &product)
+	if err != nil {
+		util.ERROR(w, http.StatusBadRequest, errors.New("Fail to parse json format").Error())
+		return
+	}
+
+	err = model.UpdateProductToDB(product)
+
+	if err != nil {
+		util.JSON(w, http.StatusBadRequest, errors.New(err.Error()))
+	} else {
+		util.JSON(w, http.StatusOK, product)
+	}
+}

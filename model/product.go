@@ -106,3 +106,20 @@ func GetProductListByStoreFromDB(storeId int) ([]Product, error) {
 
 	return productList, err
 }
+
+func UpdateProductToDB(product Product) error {
+	db := database.ConnectDB()
+	defer db.Close()
+
+	stmt, err := db.Prepare(`UPDATE PRODUCT SET product_name = ?, product_price = ?, product_variant = ? WHERE store_id = ?`)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(product.Name, product.Price, product.Variant, product.StoreId)
+	if err != nil {
+		return err
+	}
+	return err
+}
