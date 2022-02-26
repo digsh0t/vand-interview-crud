@@ -120,3 +120,20 @@ func GetStoreListByUserFromDB(userId int) ([]Store, error) {
 
 	return storeList, err
 }
+
+func UpdateStoreToDB(store Store) error {
+	db := database.ConnectDB()
+	defer db.Close()
+
+	stmt, err := db.Prepare(`UPDATE STORE SET store_name = ?, store_description = ? WHERE store_id = ?`)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(store.Name, store.Description, store.StoreId)
+	if err != nil {
+		return err
+	}
+	return err
+}

@@ -94,3 +94,28 @@ func StoreDetailHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
+
+func UpdateStoreHandler(w http.ResponseWriter, r *http.Request) {
+
+	var store model.Store
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		util.ERROR(w, http.StatusBadRequest, errors.New("Fail to update store").Error())
+		return
+	}
+	
+	err = json.Unmarshal(body, &store)
+	if err != nil {
+		util.ERROR(w, http.StatusBadRequest, errors.New("Fail to parse json format").Error())
+		return
+	}
+
+	err = model.UpdateStoreToDB(store)
+
+	if err != nil {
+		util.JSON(w, http.StatusBadRequest, errors.New(err.Error()))
+	} else {
+		util.JSON(w, http.StatusOK, store)
+	}
+}

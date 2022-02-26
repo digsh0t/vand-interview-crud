@@ -20,7 +20,8 @@ func main() {
 	router.HandleFunc("/listall", handler.ListAllWebAppUser).Methods("GET")
 
 	//Store routing
-	router.HandleFunc("/stores", handler.AddStoreHandler).Methods("POST")
+	router.HandleFunc("/store-management/stores", handler.AddStoreHandler).Methods("POST")
+	router.HandleFunc("/store-management/stores", handler.UpdateStoreHandler).Methods("PUT")
 	router.HandleFunc("/store-management/stores/{id}", handler.RemoveStoreHandler).Methods("DELETE")
 	router.HandleFunc("/store-management/stores/{id}", handler.StoreDetailHandler).Methods("GET")
 
