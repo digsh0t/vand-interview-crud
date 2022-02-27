@@ -111,15 +111,28 @@ func UpdateProductToDB(product Product) error {
 	db := database.ConnectDB()
 	defer db.Close()
 
-	stmt, err := db.Prepare(`UPDATE PRODUCT SET product_name = ?, product_price = ?, product_variant = ? WHERE store_id = ?`)
+	stmt, err := db.Prepare(`UPDATE PRODUCT SET product_name = ?, product_price = ?, product_variant = ? WHERE product_id = ?`)
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(product.Name, product.Price, product.Variant, product.StoreId)
+	_, err = stmt.Exec(product.Name, product.Price, product.Variant, product.ProductId)
 	if err != nil {
 		return err
 	}
+	return err
+}
+
+func CheckProductBelongUser(userId,productId int) (error) {
+	db := database.ConnectDB()
+	defer db.Close()
+
+	product, err := GetProductByIdFromDB(productId)
+	if err != nil {
+		return err
+	}
+
+	err = CheckStoreBelongUser(userId, product.StoreId)
 	return err
 }

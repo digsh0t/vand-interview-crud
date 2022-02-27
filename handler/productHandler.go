@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/wintltr/vand-interview-crud-project/authentication"
 	"github.com/wintltr/vand-interview-crud-project/model"
 	"github.com/wintltr/vand-interview-crud-project/util"
 )
@@ -39,15 +40,28 @@ func AddProductHandler(w http.ResponseWriter, r *http.Request) {
 
 func RemoveProductHandler(w http.ResponseWriter, r *http.Request) {
 
+	tokenData, err := authentication.ExtractTokenMetadata(r)
+	if err != nil {
+		util.ERROR(w, http.StatusBadRequest, errors.New("Please login").Error())
+		return
+	}
+
 	// Retrieve Id
 	vars := mux.Vars(r)
-	storeId, err := strconv.Atoi(vars["id"])
+	productId, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		util.ERROR(w, http.StatusUnauthorized, errors.New("Failed to retrieve Id").Error())
 		return
 	}
 
-	err = model.DeleteProductFromDB(storeId)
+	//Check authorization
+	err = model.CheckProductBelongUser(tokenData.Userid, productId)
+	if err != nil {
+		util.ERROR(w, http.StatusBadRequest, errors.New("You are not authorized to modify this store").Error())
+		return
+	}
+
+	err = model.DeleteProductFromDB(productId)
 	if err != nil {
 		util.ERROR(w, http.StatusOK, errors.New("Failed to remove product from database").Error())
 	} else {
@@ -91,6 +105,12 @@ func UpdateProductHandler(w http.ResponseWriter, r *http.Request) {
 
 	var product model.Product
 
+	tokenData, err := authentication.ExtractTokenMetadata(r)
+	if err != nil {
+		util.ERROR(w, http.StatusBadRequest, errors.New("Please login").Error())
+		return
+	}
+
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		util.ERROR(w, http.StatusBadRequest, errors.New("Fail to update product").Error())
@@ -100,6 +120,13 @@ func UpdateProductHandler(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(body, &product)
 	if err != nil {
 		util.ERROR(w, http.StatusBadRequest, errors.New("Fail to parse json format").Error())
+		return
+	}
+
+	//Check authorization
+	err = model.CheckProductBelongUser(tokenData.Userid, product.ProductId)
+	if err != nil {
+		util.ERROR(w, http.StatusBadRequest, errors.New("You are not authorized to modify this store").Error())
 		return
 	}
 

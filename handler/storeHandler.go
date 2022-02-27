@@ -47,11 +47,24 @@ func AddStoreHandler(w http.ResponseWriter, r *http.Request) {
 
 func RemoveStoreHandler(w http.ResponseWriter, r *http.Request) {
 
+	tokenData, err := authentication.ExtractTokenMetadata(r)
+	if err != nil {
+		util.ERROR(w, http.StatusBadRequest, errors.New("Please login").Error())
+		return
+	}
+
 	// Retrieve Id
 	vars := mux.Vars(r)
 	storeId, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		util.ERROR(w, http.StatusUnauthorized, errors.New("Failed to retrieve Id").Error())
+		return
+	}
+
+	//Check authorization
+	tmpStore, err := model.GetStoreByIdFromDB(storeId)
+	if tmpStore.UserId != tokenData.Userid || err != nil {
+		util.ERROR(w, http.StatusBadRequest, errors.New("You are not authorized to modify this store").Error())
 		return
 	}
 
@@ -99,6 +112,12 @@ func UpdateStoreHandler(w http.ResponseWriter, r *http.Request) {
 
 	var store model.Store
 
+	tokenData, err := authentication.ExtractTokenMetadata(r)
+	if err != nil {
+		util.ERROR(w, http.StatusBadRequest, errors.New("Please login").Error())
+		return
+	}
+
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		util.ERROR(w, http.StatusBadRequest, errors.New("Fail to update store").Error())
@@ -108,6 +127,13 @@ func UpdateStoreHandler(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(body, &store)
 	if err != nil {
 		util.ERROR(w, http.StatusBadRequest, errors.New("Fail to parse json format").Error())
+		return
+	}
+
+	//Check authorization
+	tmpStore, err := model.GetStoreByIdFromDB(store.StoreId)
+	if tmpStore.UserId != tokenData.Userid || err != nil {
+		util.ERROR(w, http.StatusBadRequest, errors.New("You are not authorized to modify this store").Error())
 		return
 	}
 

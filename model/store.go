@@ -1,6 +1,8 @@
 package model
 
 import (
+	"errors"
+
 	"github.com/wintltr/vand-interview-crud-project/database"
 )
 
@@ -134,6 +136,17 @@ func UpdateStoreToDB(store Store) error {
 	_, err = stmt.Exec(store.Name, store.Description, store.StoreId)
 	if err != nil {
 		return err
+	}
+	return err
+}
+
+func CheckStoreBelongUser(userId,storeId int) (error) {
+	db := database.ConnectDB()
+	defer db.Close()
+
+	row, err := db.Query("SELECT store_id FROM STORE where user_id = ? AND store_id = ?",userId, storeId)
+	if err != nil || !row.Next() {
+		return errors.New("No row returned")
 	}
 	return err
 }
