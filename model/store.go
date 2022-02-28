@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/wintltr/vand-interview-crud-project/database"
 )
@@ -149,4 +150,55 @@ func CheckStoreBelongUser(userId,storeId int) (error) {
 		return errors.New("No row returned")
 	}
 	return err
+}
+
+func GetTotalStoreInDB() (int,error) {
+	db := database.ConnectDB()
+	defer db.Close()
+
+	var total int
+	row := db.QueryRow("SELECT COUNT(store_id) FROM STORE")
+	err := row.Scan(&total)
+	if err != nil {
+		return -1, err
+	}
+
+	return total, err
+}
+
+func GetStoreByPage(page int, offset int) ([]Store, error) {
+	var query string
+	totalStore, err := GetTotalStoreInDB()
+	if err != nil {
+		return nil, err
+	}
+	if page * offset > totalStore && (page-1) * offset > totalStore {
+		return nil, errors.New("The page exceed limit")
+	} else {
+		query = fmt.Sprintf(`SELECT store_id, store_name, store_description, user_id FROM STORE LIMIT %d OFFSET %d;`,offset, (page-1)*offset)
+	}
+
+	db := database.ConnectDB()
+	defer db.Close()
+
+	var storeList []Store
+	selDB, err := db.Query(query)
+	if err != nil {
+		return storeList, err
+	}
+
+	var store Store
+	for selDB.Next() {
+		err = selDB.Scan(&store.StoreId, &store.Name, &store.Description, &store.UserId)
+		if err != nil {
+			return storeList, err
+		}
+		store.ProductList, err = GetProductListByStoreFromDB(store.StoreId)
+		if err != nil {
+			return storeList, err
+		}
+		storeList = append(storeList, store)
+	}
+
+	return storeList, err
 }

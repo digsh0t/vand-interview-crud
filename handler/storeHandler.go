@@ -76,13 +76,20 @@ func RemoveStoreHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func ListAllStoreHandler(w http.ResponseWriter, r *http.Request) {
+func ListStoreByPageHandler(w http.ResponseWriter, r *http.Request) {
 
-	storeList, err := model.GetAllStoreFromDB()
+	vars := mux.Vars(r)
+	page, err := strconv.Atoi(vars["page"])
+	if err != nil {
+		util.ERROR(w, http.StatusBadRequest, "failed to get page value")
+		return
+	}
+
+	storeList, err := model.GetStoreByPage(page, 10)
 
 	// Return json
 	if err != nil {
-		util.ERROR(w, http.StatusBadRequest, errors.New("fail to get all list web app users").Error())
+		util.ERROR(w, http.StatusBadRequest, errors.New("fail to get stores").Error())
 	} else {
 		util.JSON(w, http.StatusOK, storeList)
 	}

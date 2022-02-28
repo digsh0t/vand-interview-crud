@@ -69,13 +69,20 @@ func RemoveProductHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func ListAllProductHandler(w http.ResponseWriter, r *http.Request) {
+func ListProductByPageHandler(w http.ResponseWriter, r *http.Request) {
 
-	productList, err := model.GetAllProductFromDB()
+	vars := mux.Vars(r)
+	page, err := strconv.Atoi(vars["page"])
+	if err != nil {
+		util.ERROR(w, http.StatusBadRequest, "failed to get page value")
+		return
+	}
+
+	productList, err := model.GetProductByPage(page, 10)
 
 	// Return json
 	if err != nil {
-		util.ERROR(w, http.StatusBadRequest, errors.New("fail to get all list web app users").Error())
+		util.ERROR(w, http.StatusBadRequest, errors.New("fail to get products").Error())
 	} else {
 		util.JSON(w, http.StatusOK, productList)
 	}
