@@ -32,7 +32,7 @@ func main() {
 	router.HandleFunc("/product-management/products/{id}", handler.RemoveProductHandler).Methods("DELETE")
 	router.HandleFunc("/product-management/products/{id}", handler.ProductDetailHandler).Methods("GET")
 	router.HandleFunc("/product-management/products/list/{page}", handler.ListProductByPageHandler).Methods("GET")
-	router.HandleFunc("/product-management/products/search/{page}", handler.ListProductByPageHandler).Methods("POST")
+	router.HandleFunc("/product-management/products/search", handler.SearchProductByPageHandler).Methods("POST")
 
 	//User routing
 	router.HandleFunc("/user-management/users/{id}", handler.UserDetailHandler).Methods("GET")
