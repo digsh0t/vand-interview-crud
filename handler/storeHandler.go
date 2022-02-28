@@ -152,3 +152,38 @@ func UpdateStoreHandler(w http.ResponseWriter, r *http.Request) {
 		util.JSON(w, http.StatusOK, store)
 	}
 }
+
+func SearchStoreByPageHandler(w http.ResponseWriter, r *http.Request) {
+
+	type received struct {
+		SearchString string `json:"search_string"`
+		Page int `json:"page"`
+	}
+
+	var receivedValue received
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		util.ERROR(w, http.StatusBadRequest, errors.New("Fail to read user data").Error())
+		return
+	}
+	
+	err = json.Unmarshal(body, &receivedValue)
+	if err != nil {
+		util.ERROR(w, http.StatusBadRequest, errors.New("Fail to parse json format").Error())
+		return
+	}
+
+	if receivedValue.Page == 0 {
+		receivedValue.Page = 1
+	}
+
+	productList, err := model.SearchStoreByPage(receivedValue.Page, 10, receivedValue.SearchString)
+
+	// Return json
+	if err != nil {
+		util.ERROR(w, http.StatusBadRequest, errors.New("fail to get products").Error())
+	} else {
+		util.JSON(w, http.StatusOK, productList)
+	}
+}

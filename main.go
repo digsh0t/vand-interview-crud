@@ -25,6 +25,7 @@ func main() {
 	router.HandleFunc("/store-management/stores/{id}", handler.RemoveStoreHandler).Methods("DELETE")
 	router.HandleFunc("/store-management/stores/{id}", handler.StoreDetailHandler).Methods("GET")
 	router.HandleFunc("/store-management/stores/list/{page}", handler.ListStoreByPageHandler).Methods("GET")
+	router.HandleFunc("/store-management/stores/search", handler.SearchStoreByPageHandler).Methods("POST")
 
 	//Product routing
 	router.HandleFunc("/product-management/products", handler.AddProductHandler).Methods("POST")
