@@ -188,3 +188,36 @@ func GetProductByPage(page int, offset int) ([]Product, error) {
 
 	return productList, err
 }
+
+func SearchProductByPage(page int, offset int, searched string) ([]Product, error) {
+	var query string
+	totalProduct, err := GetTotalProductInDB()
+	if err != nil {
+		return nil, err
+	}
+	if page * offset > totalProduct && (page-1) * offset > totalProduct {
+		return nil, errors.New("The page exceed limit")
+	} else {
+		query = fmt.Sprintf(`SELECT product_id, product_name, product_price, product_variant, store_id FROM PRODUCT WHERE product_name LIKE '%%%s%%' LIMIT %d OFFSET %d;`,searched, offset, (page-1)*offset)
+	}
+
+	db := database.ConnectDB()
+	defer db.Close()
+
+	var productList []Product
+	selDB, err := db.Query(query)
+	if err != nil {
+		return productList, err
+	}
+
+	var product Product
+	for selDB.Next() {
+		err = selDB.Scan(&product.ProductId, &product.Name, &product.Price, &product.Variant, &product.StoreId)
+		if err != nil {
+			return productList, err
+		}
+		productList = append(productList, product)
+	}
+
+	return productList, err
+}
