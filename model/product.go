@@ -1,8 +1,10 @@
 package model
 
 import (
+	"encoding/csv"
 	"errors"
 	"fmt"
+	"os"
 
 	"github.com/wintltr/vand-interview-crud-project/database"
 )
@@ -220,4 +222,33 @@ func SearchProductByPage(page int, offset int, searched string) ([]Product, erro
 	}
 
 	return productList, err
+}
+
+func ExportAllProductToCSV(location string) error {
+	productList, err := GetAllProductFromDB()
+	if err != nil {
+		return err
+	}
+	csvFile, err := os.Create(location)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer csvFile.Close()
+
+	writer := csv.NewWriter(csvFile)
+
+	for _, product := range productList {
+		var row []string
+		row = append(row,fmt.Sprint(product.ProductId))
+		row = append(row, product.Name)
+		row = append(row, fmt.Sprintf("%.3f", product.Price))
+		row = append(row, product.Variant)
+		row = append(row,fmt.Sprint(product.StoreId))
+		writer.Write(row)
+	}
+
+	// remember to flush!
+	writer.Flush()
+	return err
 }

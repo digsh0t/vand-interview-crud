@@ -7,9 +7,11 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/wintltr/vand-interview-crud-project/handler"
+	"github.com/wintltr/vand-interview-crud-project/util"
 )
 
 func main() {
+	util.StartExportCSVCron("0 1 * * *")
 	router := mux.NewRouter().StrictSlash(true)
 	credentials := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
 	methods := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"})
